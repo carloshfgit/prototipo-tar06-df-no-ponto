@@ -1,0 +1,12 @@
+{
+  "name": "DF no Ponto — Protótipo TAR-06",
+  "short_name": "DF no Ponto",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F5F5F5",
+  "theme_color": "#175898",
+  "lang": "pt-BR",
+  "icons": [{"src": "icone.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable"}]
+}

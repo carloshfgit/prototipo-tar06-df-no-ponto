@@ -1,0 +1,830 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#175898">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="DF no Ponto">
+<title>DF no Ponto — Protótipo TAR-06</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icone.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* Protótipo de alta fidelidade da TAR-06 (Grupo 05 — IHC 2026/2). Autor do design: Carlos Costa.
+   Cores medidas nas capturas do aplicativo DF no Ponto (prototipo-plan.md, seção 2.1). */
+:root{
+  --azul-app:#175898; --azul-texto:#194778; --azul-link:#417AD4; --azul-acao:#2196F3; --azul-ponto:#3B87FF;
+  --amarelo-ativo:#ECB43B; --amarelo-linha:#FFD403; --fundo:#F5F5F5; --cartao:#FFFFFF; --texto:#252525;
+  --texto-apoio:#6B6B6B; --texto-dica:#9A9A9A; --linha-div:#E3E3E3; --cinza-botao:#656565;
+  --mapa-escuro:#1A2A41; --mapa-agua:#CFE7FF;
+  --alerta:#B85C00; --alerta-fundo:#FFF3E0; --alerta-borda:#F0B46A; --sucesso:#2E7D32;
+  --seg-topo:env(safe-area-inset-top,0px); --seg-base:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--fundo);color:var(--texto);
+  font-family:"Fira Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:16px;overscroll-behavior:none}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:3px solid var(--azul-acao);outline-offset:2px}
+svg.i{width:24px;height:24px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#app{position:fixed;inset:0;overflow:hidden;background:var(--fundo);display:flex;flex-direction:column}
+@media (min-width:700px) and (min-height:760px){
+  body{background:#D9DEE5}
+  #app{inset:auto;left:50%;top:50%;transform:translate(-50%,-50%);width:390px;height:844px;border-radius:44px;
+    border:10px solid #121212;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+}
+#palco{position:relative;flex:1;min-height:0}
+.tela{position:absolute;inset:0;display:flex;flex-direction:column;background:var(--fundo)}
+.rolagem{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch}
+
+/* Barra superior (prints 2 e 3) */
+.topo{background:var(--azul-app);color:#fff;padding:calc(var(--seg-topo) + 12px) 6px 14px;display:grid;
+  grid-template-columns:52px 1fr 52px;align-items:center;min-height:68px;flex:none}
+.topo h1{margin:0;font-size:18px;font-weight:500;text-align:center;line-height:1.25}
+.btn-icone{width:48px;height:48px;border:0;background:none;display:grid;place-items:center;border-radius:24px;color:inherit}
+.btn-icone svg.i{width:28px;height:28px}
+.faixa-inicio{background:var(--azul-app);height:calc(var(--seg-topo) + 18px);flex:none}
+
+/* Barra de abas (print 1) */
+#abas{flex:none;background:var(--azul-app);display:grid;grid-template-columns:repeat(4,1fr);padding:6px 0 calc(var(--seg-base) + 6px)}
+#abas[hidden]{display:none}
+#abas button{border:0;background:none;color:#fff;display:flex;flex-direction:column;align-items:center;gap:4px;
+  padding:6px 0;font-size:14px;font-weight:500;min-height:60px}
+#abas button svg.i{width:28px;height:28px}
+#abas button.ativa{color:var(--amarelo-ativo)}
+
+/* Tela inicial */
+.inicio-cab{background:#fff;padding:14px 16px 10px;flex:none}
+.busca{width:100%;display:flex;align-items:center;gap:14px;border:0;background:var(--fundo);border-radius:16px;
+  padding:16px 18px;text-align:left;color:var(--texto-dica);font-size:17px}
+.busca svg.i{color:#333;width:26px;height:26px}
+.dica{margin:12px 8px 0;text-align:center;font-size:14.5px;font-weight:500;color:#333;line-height:1.4}
+.favs{margin-top:12px}
+.favs h2{font-size:14px;font-weight:700;color:var(--azul-texto);margin:0 4px 8px;display:flex;align-items:center;gap:6px}
+.favs h2 svg.i{width:18px;height:18px}
+.favs .vazio{font-size:14px;color:var(--texto-apoio);margin:0 4px}
+.favs-lista{display:flex;gap:10px;overflow-x:auto;padding-bottom:2px}
+.fav-mini{border:1px solid var(--linha-div);background:#fff;border-radius:12px;padding:8px 10px;display:flex;align-items:center;gap:10px;flex:none}
+.fav-mini .eta-p{font-weight:700;color:var(--azul-texto);font-size:15px}
+.mapa-card{position:relative;flex:1;min-height:0;margin:4px 16px 14px;border-radius:24px;overflow:hidden;background:var(--mapa-escuro)}
+.mapa-card svg.mapa{position:absolute;inset:0;width:100%;height:100%}
+.tela.mapa-cheio .inicio-cab .dica,.tela.mapa-cheio .inicio-cab .favs{display:none}
+.fab{position:absolute;right:14px;width:58px;height:58px;border-radius:50%;border:0;display:grid;place-items:center;
+  box-shadow:0 2px 8px rgba(0,0,0,.25);color:#fff}
+.fab.azul{background:var(--azul-acao)}
+.fab.cinza{background:var(--cinza-botao);border-radius:12px;width:52px;height:52px;right:17px}
+.fab svg.i{width:28px;height:28px}
+.parada{cursor:pointer}
+
+/* Busca */
+.busca-cab{background:#fff;padding:calc(var(--seg-topo) + 10px) 10px 10px 4px;display:flex;align-items:center;gap:4px;
+  border-bottom:1px solid var(--linha-div);flex:none}
+.busca-cab .btn-icone{color:var(--azul-app)}
+.campo{flex:1;display:flex;align-items:center;gap:10px;background:var(--fundo);border-radius:16px;padding:0 6px 0 14px}
+.campo svg.i{color:#333}
+.campo input{flex:1;border:0;background:none;font:inherit;font-size:17px;padding:15px 0;color:var(--texto);min-width:0}
+.campo input::placeholder{color:var(--texto-dica)}
+.campo input:focus{outline:none}
+.campo .limpar{width:40px;height:40px;border:0;background:none;color:#555;display:grid;place-items:center}
+.grupo-tit{font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--texto-apoio);margin:18px 16px 6px}
+.sug{width:100%;display:flex;align-items:center;gap:14px;border:0;background:#fff;padding:14px 16px;text-align:left;
+  border-bottom:1px solid var(--linha-div);min-height:64px}
+.sug .ic-lugar{width:40px;height:40px;border-radius:50%;background:#EAF1FB;color:var(--azul-app);display:grid;place-items:center;flex:none}
+.sug strong{display:block;font-weight:500}
+.sug small{display:block;color:var(--texto-apoio);font-size:14px;margin-top:2px}
+.msg-vazia{padding:28px 24px;text-align:center;color:var(--texto-apoio);line-height:1.5}
+.msg-vazia strong{color:var(--texto)}
+.erro-busca{margin:18px 16px;background:#fff;border-radius:16px;padding:18px;border:1px solid var(--linha-div);line-height:1.5}
+.erro-busca p{margin:0 0 12px}
+.link-sug{border:0;background:#EAF1FB;color:var(--azul-app);font-weight:500;border-radius:20px;padding:10px 16px;margin:4px 6px 0 0}
+
+/* Chip de linha (prints 2 e 3) */
+.chip{display:inline-flex;align-items:center;gap:8px;background:#EFEFEF;border-left:6px solid var(--amarelo-linha);
+  border-radius:6px;padding:8px 12px 8px 10px;font-weight:700;font-size:17px;color:var(--texto);flex:none}
+.chip svg.i{color:var(--azul-app);width:24px;height:24px}
+
+/* Resultados / alternativas */
+.lugar-cab{background:#fff;padding:16px;display:flex;gap:12px;align-items:flex-start;border-bottom:1px solid var(--linha-div)}
+.lugar-cab .ic-lugar{color:#4CAF50}
+.lugar-cab strong{display:block;font-size:17px}
+.lugar-cab small{display:block;color:var(--texto-apoio);font-size:14px;margin-top:4px;line-height:1.4}
+.secao-tit{color:var(--azul-link);font-weight:500;font-size:16px;margin:18px 16px 8px}
+.item{width:100%;display:block;border:0;background:#fff;text-align:left;padding:16px;border-bottom:1px solid var(--linha-div)}
+.item-l1{display:flex;align-items:center;gap:12px}
+.item-l1 .dest{flex:1;font-weight:500;line-height:1.3}
+.item-l1 .seta{color:#666}
+.item-l2{display:flex;align-items:center;gap:10px;margin-top:10px;flex-wrap:wrap}
+.eta{color:var(--azul-texto);font-weight:700;font-size:18px}
+.desce{color:var(--texto-apoio);font-size:14.5px;display:inline-flex;align-items:center;gap:4px}
+.desce svg.i{width:20px;height:20px}
+.selo{display:inline-flex;align-items:center;gap:4px;font-size:13.5px;font-weight:500;border-radius:14px;padding:4px 10px}
+.selo svg.i{width:16px;height:16px}
+.selo.ok{background:#E3F0FC;color:var(--azul-texto)}
+.selo.alerta{background:var(--alerta-fundo);color:var(--alerta)}
+.selo.nao{background:#EEE;color:#555}
+.eta.antiga{color:#8A8A8A;text-decoration:line-through}
+
+/* Tela da linha */
+.mapa-luz{position:relative;height:36%;min-height:200px;flex:none;background:#F7F8FA;transition:height .25s}
+.mapa-luz svg.mapa{position:absolute;inset:0;width:100%;height:100%}
+.tela.mapa-cheio .mapa-luz{height:72%}
+.mapa-luz .fab{width:52px;height:52px}
+.folha{flex:1;min-height:0;background:#fff;border-radius:24px 24px 0 0;margin-top:-22px;position:relative;z-index:2;
+  overflow-y:auto;box-shadow:0 -2px 10px rgba(0,0,0,.08);padding:0 16px 24px}
+.alca{width:64px;height:6px;border-radius:3px;background:#D0D0D0;margin:12px auto 16px}
+.linha-cab{display:flex;align-items:center;gap:12px}
+.linha-cab strong{display:block;font-size:17px;line-height:1.3}
+.linha-cab small{display:block;color:var(--texto-apoio);font-size:14px;margin-top:2px}
+.previsao{margin-top:16px}
+.eta-grande{font-size:28px;font-weight:700;color:var(--azul-texto);line-height:1.15}
+.previsao .sub{display:block;color:var(--texto-apoio);font-size:14.5px;margin-top:4px}
+.previsao.antiga .eta-grande{color:#8A8A8A}
+.nota-antiga{display:inline-block;margin-left:6px;font-size:14px;font-weight:500;color:var(--alerta)}
+.atualizacao{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:15px;color:#3E3E3E}
+.atualizacao svg.i{width:20px;height:20px;color:var(--azul-app)}
+.atualizacao.alerta{color:var(--alerta);font-weight:700}
+.atualizacao.alerta svg.i{color:var(--alerta)}
+.aviso{margin-top:14px;background:var(--alerta-fundo);border:1.5px solid var(--alerta-borda);border-radius:16px;padding:14px;
+  animation:sobe .35s ease-out}
+@keyframes sobe{from{transform:translateY(16px);opacity:0}to{transform:none;opacity:1}}
+.aviso-l1{display:flex;gap:10px;color:#4A2A00;line-height:1.4}
+.aviso-l1 svg.i{color:var(--alerta);width:26px;height:26px}
+.aviso-l1 p{margin:0}
+.aviso-botoes{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.btn{border-radius:12px;min-height:50px;font-weight:700;font-size:15.5px;display:flex;align-items:center;justify-content:center;gap:8px;padding:8px 10px;line-height:1.2}
+.btn svg.i{width:20px;height:20px}
+.btn.prim{background:var(--azul-app);color:#fff;border:0}
+.btn.sec{background:#fff;color:var(--azul-app);border:2px solid var(--azul-app)}
+.carregando{display:flex;align-items:center;gap:10px;margin-top:12px;color:#4A2A00;font-weight:500}
+.giro{width:22px;height:22px;border-radius:50%;border:3px solid #E9C9A0;border-top-color:var(--alerta);animation:gira .8s linear infinite}
+@keyframes gira{to{transform:rotate(360deg)}}
+.acoes{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+.btn-acao{border:2px solid var(--azul-app);background:#fff;color:var(--azul-app);border-radius:12px;min-height:54px;
+  display:flex;align-items:center;justify-content:center;gap:8px;font-weight:700;font-size:15.5px;padding:6px 8px}
+.btn-acao.ativo{background:var(--azul-app);color:#fff}
+.btn-acao.ativo svg.i{fill:currentColor}
+.sec-tit{font-size:15px;font-weight:700;color:var(--azul-texto);margin:22px 0 4px}
+.tl{list-style:none;margin:0;padding:0}
+.tl li{display:grid;grid-template-columns:44px 1fr;gap:10px;padding:12px 0;border-bottom:1px solid var(--linha-div);align-items:center;line-height:1.4}
+.tl li:last-child{border-bottom:0}
+.tl .marca{display:grid;place-items:center;color:#222}
+.tl .ponto-azul{width:22px;height:22px;border-radius:50%;background:var(--azul-ponto);box-shadow:0 0 0 7px #DCE9FF}
+.tl .bandeira{width:40px;height:40px;border-radius:50%;background:#3358A9;color:#fff;display:grid;place-items:center}
+.tl .bandeira svg.i{width:22px;height:22px}
+.tl li.trecho-onibus .marca{align-self:stretch;position:relative}
+.tl li.trecho-onibus .marca::before{content:"";position:absolute;top:6px;bottom:6px;left:50%;width:5px;margin-left:-2.5px;background:var(--amarelo-linha);border-radius:3px}
+.tl li.trecho-onibus .marca::after{content:"";position:absolute;top:2px;left:50%;width:12px;height:12px;margin-left:-6px;border-radius:50%;background:var(--amarelo-linha)}
+.tl b{font-weight:700}
+.tl small{display:block;color:var(--texto-apoio)}
+.aviso-linha-errada{margin-top:14px;background:#F0F0F0;border-radius:12px;padding:12px;font-size:14.5px;display:flex;gap:8px;line-height:1.4}
+
+/* Favoritos / fora do protótipo */
+.vazio-grande{margin:40px 24px;text-align:center;color:var(--texto-apoio);line-height:1.6}
+.vazio-grande svg.i{width:48px;height:48px;color:#B5B5B5;margin-bottom:8px}
+.fora{margin:24px 16px;background:#fff;border-radius:16px;padding:24px;text-align:center;line-height:1.5}
+.fora svg.i{width:44px;height:44px;color:var(--azul-app)}
+.fora .btn{margin:16px auto 0;max-width:240px}
+
+/* Aviso flutuante e folha modal */
+#toast{position:absolute;left:12px;right:12px;bottom:calc(var(--seg-base) + 90px);background:#2B2B2B;color:#fff;border-radius:12px;
+  padding:14px 14px 14px 16px;display:flex;align-items:center;gap:10px;box-shadow:0 6px 20px rgba(0,0,0,.3);z-index:50;
+  opacity:0;transform:translateY(12px);pointer-events:none;transition:.25s;line-height:1.35}
+#toast.visivel{opacity:1;transform:none;pointer-events:auto}
+#toast svg.i{color:#7BD88F}
+#toast span{flex:1}
+#toast button{border:0;background:none;color:#9CC7FF;font-weight:700;padding:8px;min-height:40px}
+#toast.sem-abas{bottom:calc(var(--seg-base) + 20px)}
+.veu{position:absolute;inset:0;background:rgba(0,0,0,.45);z-index:60;display:flex;align-items:flex-end}
+.veu[hidden]{display:none}
+.modal{background:#fff;width:100%;border-radius:24px 24px 0 0;padding:8px 18px calc(var(--seg-base) + 18px);animation:sobe .25s ease-out;max-height:92%;overflow-y:auto}
+.modal h2{font-size:19px;margin:6px 0 6px;line-height:1.3}
+.modal p{margin:0 0 12px;color:var(--texto-apoio);line-height:1.45}
+.opcao{display:flex;align-items:center;gap:12px;border:1.5px solid var(--linha-div);border-radius:12px;padding:14px;margin-bottom:10px;cursor:pointer}
+.opcao input{width:22px;height:22px;accent-color:var(--azul-app)}
+.opcao.marcada{border-color:var(--azul-app);background:#F3F8FE}
+.opcao small{display:block;color:var(--texto-apoio)}
+.modal-botoes{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+
+/* Painel do condutor */
+#painel .modal{border-radius:18px;margin:auto 12px;width:auto;flex:1}
+#painel{align-items:center}
+#painel .linha-p{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:10px 0}
+#painel input[type=number]{width:80px;font:inherit;padding:8px;border:1px solid #CCC;border-radius:8px}
+#painel .btn{width:100%;margin-top:8px}
+#painel textarea{width:100%;height:120px;font:12px monospace;margin-top:8px}
+#painel .meta{font-size:13px;color:var(--texto-apoio)}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="palco"></div>
+  <nav id="abas" aria-label="Navegação principal">
+    <button data-acao="aba" data-aba="A1" data-log="Aba Mapa"><svg class="i"><use href="#i-mapa"/></svg>Mapa</button>
+    <button data-acao="aba" data-aba="horarios" data-log="Aba Horários"><svg class="i"><use href="#i-relogio"/></svg>Horários</button>
+    <button data-acao="aba" data-aba="A6" data-log="Aba Favoritos"><svg class="i"><use href="#i-marcador"/></svg>Favoritos</button>
+    <button data-acao="aba" data-aba="mais" data-log="Aba Mais"><svg class="i"><use href="#i-menu"/></svg>Mais</button>
+  </nav>
+  <div id="toast" role="status" aria-live="polite"><svg class="i"><use href="#i-check"/></svg><span></span><button hidden>Desfazer</button></div>
+  <div id="veu-aviso" class="veu" hidden></div>
+  <div id="painel" class="veu" hidden></div>
+</div>
+
+<!-- Ícones (desenhados para o protótipo, no estilo de linha do app) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-busca" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></symbol>
+  <symbol id="i-voltar" viewBox="0 0 24 24"><path d="M15 4 7 12l8 8"/></symbol>
+  <symbol id="i-onibus" viewBox="0 0 24 24"><rect x="4.5" y="3" width="15" height="15" rx="3"/><path d="M4.5 11h15M8 6.5h8M7.5 18v2.5M16.5 18v2.5"/><circle cx="8.3" cy="14.5" r=".9"/><circle cx="15.7" cy="14.5" r=".9"/></symbol>
+  <symbol id="i-relogio" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></symbol>
+  <symbol id="i-marcador" viewBox="0 0 24 24"><path d="M6.5 3.5h11v17L12 16.5l-5.5 4z"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 6.5h16M4 12h16M4 17.5h16"/></symbol>
+  <symbol id="i-mapa" viewBox="0 0 24 24"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.6"/></symbol>
+  <symbol id="i-sino" viewBox="0 0 24 24"><path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.8 1.8H4.2z"/><path d="M10 20.5a2 2 0 0 0 4 0"/></symbol>
+  <symbol id="i-alerta" viewBox="0 0 24 24"><path d="M12 3.5 2.5 20h19z"/><path d="M12 10v4.5M12 17.3v.2"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+  <symbol id="i-andar" viewBox="0 0 24 24"><circle cx="13" cy="4.5" r="1.8"/><path d="M9.5 21l2.2-6 3 2.8V21M7 11.5l3-3.5h3.5l2 3.5 3 1M11.7 15l-1.2-3.6M3 21h7"/></symbol>
+  <symbol id="i-bandeira" viewBox="0 0 24 24"><path d="M6 21V4M6 4.5h11l-2.2 4 2.2 4H6"/></symbol>
+  <symbol id="i-seta" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></symbol>
+  <symbol id="i-fechar" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+  <symbol id="i-expandir" viewBox="0 0 24 24"><path d="M14 4h6v6M10 20H4v-6M20 4l-6.5 6.5M4 20l6.5-6.5"/></symbol>
+  <symbol id="i-ajuda" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 0 1 4.8.9c0 1.9-2.4 2.2-2.4 4M12 17.2v.2"/></symbol>
+  <symbol id="i-atualizar" viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.4-5.7"/><path d="M20 4v5h-5"/></symbol>
+  <symbol id="i-alternativas" viewBox="0 0 24 24"><path d="M4 7.5h14M15 4.5l3 3-3 3M20 16.5H6M9 13.5l-3 3 3 3"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 7.8v.2"/></symbol>
+  <symbol id="i-navegar" viewBox="0 0 24 24"><path d="M20.5 3.5 3.5 10.8l7.2 2.5 2.5 7.2z" fill="currentColor" stroke="none"/></symbol>
+</svg>
+
+<script>
+"use strict";
+const VERSAO = "1.0 (10/11/2026)";
+const CHAVE = "tar06-prototipo-v1";
+const MIN = 60000;
+
+/* ---------- Dados fictícios (prototipo-plan.md, seção 3) ---------- */
+const LINHAS = {
+  "2310": {destino:"UnB — Campus do Gama", base:4, viagem:38, desembarque:"UnB — Campus do Gama (portão principal)", andarFim:null, desce:"Desce na UnB", vaiUnb:true, fase:3000},
+  "2301": {destino:"Setor Central do Gama", base:8, viagem:32, desembarque:"Setor Central do Gama — Quadra 1", andarFim:{m:"900 m", min:12}, desce:"Desce a 900 m da UnB", vaiUnb:false, fase:9000},
+  "2302": {destino:"Gama Leste", base:12, viagem:34, desembarque:"Gama Leste — Quadra 5", andarFim:{m:"1,4 km", min:18}, desce:"Desce a 1,4 km da UnB", vaiUnb:false, fase:6000},
+  "2130": {destino:"Rodoviária do Plano Piloto", base:6, viagem:52, desembarque:"Rodoviária do Plano Piloto — Plataforma B", andarFim:null, desce:"Não passa pela UnB Gama", vaiUnb:false, naoUnb:true, fase:1000}
+};
+const PONTOS = {
+  "qr304": {nome:"QR 304 — Samambaia Norte", dist:"120 m", andar:2, atraso:0},
+  "qr302": {nome:"QR 302 — Samambaia Norte", dist:"450 m", andar:6, atraso:3},
+  "qr306": {nome:"QR 306 — Samambaia Norte", dist:"380 m", andar:5, atraso:2}
+};
+const UNB = "UnB — Campus do Gama";
+const ORDEM_LUGAR = ["2301","2310","2302"];
+const ORDEM_PONTO = ["2130","2301","2302","2310"];
+const SINONIMOS_UNB = "unb universidade de brasilia campus do gama fga fcte faculdade gama engenharia";
+
+/* ---------- Estado (salvo no celular) ---------- */
+function estadoNovo(){
+  return {t0:Date.now(), sessao:1, favs:[], avisos:{}, recentes:[], chegadas:{}, ponto:"qr304",
+    n1:{atraso:20, abertura:null, ativo:false, resolvido:false, ultimaPos:null, etaCong:null, carregando:false},
+    registro:[]};
+}
+let E;
+try{ E = JSON.parse(localStorage.getItem(CHAVE)) || estadoNovo(); }catch(e){ E = estadoNovo(); }
+function salvar(){ try{ localStorage.setItem(CHAVE, JSON.stringify(E)); }catch(e){} }
+
+/* ---------- Registro de toques e telas (PE-03) ---------- */
+let telaAtual = null;
+function registrar(evento, alvo){
+  const agora = Date.now();
+  E.registro.push({hora:new Date(agora).toLocaleTimeString("pt-BR"), s:Math.round((agora-E.t0)/100)/10, tela:telaAtual?telaAtual.tela:"-", evento, alvo:alvo||""});
+  if(E.registro.length > 3000) E.registro.shift();
+  salvar();
+}
+
+/* ---------- Relógio das previsões ---------- */
+function chegada(id){
+  const agora = Date.now();
+  let c = E.chegadas[id];
+  if(!c){ c = E.t0 + (LINHAS[id].base + 1) * MIN - 1000; }
+  while(c - agora < 20000) c += 15 * MIN; // próximo ônibus da linha
+  E.chegadas[id] = c;
+  return c;
+}
+function desatualizada(id){ return id === "2310" && E.n1.ativo; }
+function etaMin(id){
+  const p = PONTOS[E.ponto] || PONTOS.qr304;
+  if(desatualizada(id)) return E.n1.etaCong + p.atraso;
+  return Math.max(1, Math.floor((chegada(id) - Date.now()) / MIN)) + p.atraso;
+}
+function etaTexto(id){ return "Chega em " + etaMin(id) + " min"; }
+function ultimaPos(id){
+  if(desatualizada(id)) return E.n1.ultimaPos;
+  const agora = Date.now(), f = LINHAS[id].fase;
+  return agora - ((agora - E.t0 + f) % 15000);
+}
+function textoAtualizacao(id){
+  const s = Math.floor((Date.now() - ultimaPos(id)) / 1000);
+  if(s < 60) return s < 3 ? "Última atualização: agora" : "Última atualização: há " + s + " s";
+  return "Última atualização: há " + Math.floor(s/60) + " min";
+}
+function hhmm(ts){ const d = new Date(ts); return d.getHours() + "h" + String(d.getMinutes()).padStart(2,"0"); }
+function norm(s){ return s.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().trim(); }
+function esc(s){ return String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+const ic = (n, extra="") => `<svg class="i" ${extra} aria-hidden="true"><use href="#i-${n}"/></svg>`;
+const chip = id => `<span class="chip">${ic("onibus")}${id}</span>`;
+
+/* ---------- Navegação ---------- */
+const palco = document.getElementById("palco");
+const abas = document.getElementById("abas");
+function ir(tela, params={}, substituir=false){
+  const st = {tela, params};
+  if(substituir) history.replaceState(st, ""); else history.pushState(st, "");
+  mostrar(st);
+}
+function voltar(){ if(history.state && history.state.tela !== "A1") history.back(); else ir("A1", {}, true); }
+window.addEventListener("popstate", ev => mostrar(ev.state || {tela:"A1", params:{}}));
+
+const TELAS = {};
+const ABA_DA_TELA = {A1:"A1", A6:"A6", horarios:"horarios", mais:"mais"};
+function mostrar(st){
+  telaAtual = st;
+  const fn = TELAS[st.tela] || TELAS.A1;
+  palco.innerHTML = `<section class="tela" data-tela="${st.tela}">${fn(st.params || {})}</section>`;
+  const aba = ABA_DA_TELA[st.tela];
+  abas.hidden = !aba;
+  abas.querySelectorAll("button").forEach(b => b.classList.toggle("ativa", b.dataset.aba === aba));
+  document.getElementById("toast").classList.toggle("sem-abas", !aba);
+  registrar("tela", st.tela + (st.params && st.params.linha ? " " + st.params.linha : "") + (st.params && st.params.modo ? " " + st.params.modo : ""));
+  if(st.tela === "A4" && st.params.linha === "2310" && !E.n1.abertura){ E.n1.abertura = Date.now(); salvar(); }
+  if(st.tela === "A2"){ const inp = palco.querySelector("input"); if(inp){ inp.focus(); atualizarSugestoes(inp.value); } }
+  if(st.tela === "A4") posicionarOnibus();
+  if(st.tela === "A1") ligarSegurar();
+}
+
+/* ---------- A1 — Início (print 1) ---------- */
+TELAS.A1 = () => `
+  <div class="faixa-inicio" id="faixa"></div>
+  <div class="inicio-cab" id="cab-inicio">
+    <button class="busca" data-acao="abrirBusca" data-log="Campo de busca">${ic("busca")}<span>Busque uma linha, ponto ou local</span></button>
+    <p class="dica">Navegue no mapa e toque nos pontos de parada para visualizar as próximas partidas</p>
+    ${faixaFavoritos()}
+  </div>
+  <div class="mapa-card">
+    ${mapaEscuro()}
+    <button class="fab azul" style="bottom:84px" data-acao="localizar" data-log="Botão minha localização" aria-label="Mostrar minha localização">${ic("navegar")}</button>
+    <button class="fab cinza" style="bottom:20px" data-acao="mapaCheio" data-log="Botão tela cheia do mapa" aria-label="Ampliar o mapa">${ic("expandir")}</button>
+  </div>`;
+
+function faixaFavoritos(){
+  if(!E.favs.length) return `<div class="favs"><h2>${ic("marcador")}Suas linhas favoritas</h2><p class="vazio">Nenhuma linha favorita ainda.</p></div>`;
+  return `<div class="favs"><h2>${ic("marcador")}Suas linhas favoritas</h2><div class="favs-lista">${
+    E.favs.map(id => `<button class="fav-mini" data-acao="abrirLinha" data-linha="${id}" data-log="Favorita ${id} (início)">${chip(id)}<span class="eta-p" data-eta="${id}">${etaMin(id)} min</span>${E.avisos[id]?ic("sino",'style="width:18px;height:18px;color:var(--azul-app)"'):""}</button>`).join("")
+  }</div></div>`;
+}
+
+function mapaEscuro(){
+  const parada = (x, y, ponto, sentido) => `
+    <g class="parada" transform="translate(${x} ${y})" data-acao="abrirPonto" data-ponto="${ponto}" data-log="Ponto no mapa ${ponto}" role="button" aria-label="Ponto de parada ${PONTOS[ponto].nome}">
+      <rect x="-15" y="-13" width="30" height="24" rx="6" fill="#2F5BA8"/>
+      <use href="#i-onibus" x="-10" y="-11" width="20" height="20" stroke="#fff" fill="none" stroke-width="2"/>
+      <circle cx="11" cy="10" r="7" fill="#fff"/><path d="M11 ${sentido>0?"6.5":"13.5"}v${sentido>0?7:-7}M8.3 ${sentido>0?"10.8":"9.2"} 11 ${sentido>0?"13.5":"6.5"} 13.7 ${sentido>0?"10.8":"9.2"}" stroke="#2F5BA8" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+      <rect x="-24" y="-22" width="48" height="44" fill="transparent"/>
+    </g>`;
+  const poi = (x,y) => `<g transform="translate(${x} ${y})"><circle r="11" fill="#F2A65A"/><path d="M-3 -5v10M-5 -5v3a2 2 0 0 0 4 0v-3M3 5v-10c2 1 2 5 0 6" stroke="#1A2A41" stroke-width="1.4" fill="none"/></g>`;
+  const rotulo = (x,y,t,r=0,c="#9AA9C0",s=13) => `<text x="${x}" y="${y}" transform="rotate(${r} ${x} ${y})" fill="${c}" font-size="${s}" font-family="Fira Sans,system-ui,sans-serif" font-weight="500">${t}</text>`;
+  return `<svg class="mapa" viewBox="0 0 360 560" preserveAspectRatio="xMidYMid slice" aria-label="Mapa da região de Samambaia Norte com os pontos de parada">
+    <rect width="360" height="560" fill="#1A2A41"/>
+    <g fill="none" stroke="#2A3C58" stroke-width="1.4">
+      ${[30,95,160,225,290].map(x=>`<path d="M${x} 0V560"/>`).join("")}
+      ${[60,130,200,270,340,410,480].map(y=>`<path d="M0 ${y}H360"/>`).join("")}
+      <path d="M0 520 360 380"/><path d="M40 0c40 120 10 250 60 560"/>
+    </g>
+    <g fill="#22344F">${[[38,68,50,55],[104,68,50,55],[168,138,50,55],[234,208,50,55],[38,278,50,55],[298,348,50,55],[104,418,50,55],[234,418,50,55]].map(r=>`<rect x="${r[0]}" y="${r[1]}" width="${r[2]}" height="${r[3]}" rx="4"/>`).join("")}</g>
+    <path d="M205 -10C215 150 196 300 186 570" stroke="#3B5478" stroke-width="30" fill="none"/>
+    <path d="M205 -10C215 150 196 300 186 570" stroke="#2D4466" stroke-width="2" stroke-dasharray="6 8" fill="none"/>
+    <path d="M-10 236C110 226 240 250 370 232" stroke="#31476A" stroke-width="12" fill="none"/>
+    ${rotulo(160,312,"Av. Samambaia Norte",90,"#B5C2D6",13)}
+    ${rotulo(18,224,"QR 304",0)} ${rotulo(258,180,"QR 306",0)} ${rotulo(30,470,"QR 302",0)}
+    ${rotulo(250,520,"Feira da Samambaia",-8,"#E8A15A",13)}
+    ${poi(286,515)} ${poi(70,170)} ${poi(318,96)}
+    <rect x="300" y="300" width="14" height="22" fill="#1E6E6A"/>
+    ${parada(178,282,"qr304",1)} ${parada(222,300,"qr304",-1)}
+    ${parada(200,142,"qr306",1)} ${parada(236,158,"qr306",-1)}
+    ${parada(176,452,"qr302",1)} ${parada(214,466,"qr302",-1)}
+    <circle cx="140" cy="300" r="20" fill="#3B87FF" opacity=".18"/>
+    <circle cx="140" cy="300" r="9" fill="#3B87FF" stroke="#fff" stroke-width="3"/>
+  </svg>`;
+}
+
+/* ---------- A2 — Busca com sugestões ---------- */
+TELAS.A2 = p => `
+  <div class="busca-cab">
+    <button class="btn-icone" data-acao="voltar" data-log="Voltar" aria-label="Voltar">${ic("voltar")}</button>
+    <div class="campo">${ic("busca")}
+      <input id="q" type="text" inputmode="search" enterkeyhint="search" autocomplete="off" autocapitalize="off" spellcheck="false"
+        placeholder="Busque uma linha, ponto ou local" aria-label="Busque uma linha, ponto ou local" value="${esc(p.q||"")}">
+      <button class="limpar" data-acao="limparBusca" data-log="Limpar busca" aria-label="Limpar a busca">${ic("fechar")}</button>
+    </div>
+  </div>
+  <div class="rolagem" id="sugestoes"></div>`;
+
+function buscar(qBruto){
+  const q = norm(qBruto);
+  const lugares = [], linhas = [];
+  if(!q) return {lugares, linhas};
+  const palavras = q.split(/\s+/);
+  const hayUnb = norm(UNB + " " + SINONIMOS_UNB).split(/\s+/);
+  if(palavras.every(w => hayUnb.some(h => h.startsWith(w)))) lugares.push({tipo:"lugar", nome:UNB, sub:"Lugar · Gama"});
+  for(const [k,p] of Object.entries(PONTOS)){
+    const hay = norm("ponto parada " + p.nome).split(/[\s—-]+/).filter(Boolean);
+    if(palavras.every(w => hay.some(h => h.startsWith(w)))) lugares.push({tipo:"ponto", id:k, nome:"Ponto " + p.nome, sub:"Ponto de parada · " + p.dist + " de você"});
+  }
+  const soNumero = /^\d+$/.test(q);
+  for(const id of Object.keys(LINHAS).sort()){
+    const L = LINHAS[id];
+    if(soNumero ? (id.startsWith(q) || id.includes(q)) : (q.length >= 3 && palavras.every(w => norm(L.destino).split(/[\s—-]+/).some(h => h.startsWith(w)))))
+      linhas.push(id);
+  }
+  return {lugares, linhas};
+}
+function atualizarSugestoes(qBruto){
+  const alvo = document.getElementById("sugestoes"); if(!alvo) return;
+  if(!norm(qBruto)){
+    alvo.innerHTML = E.recentes.length
+      ? `<p class="grupo-tit">Buscas recentes</p>` + E.recentes.map(r => `<button class="sug" data-acao="usarRecente" data-q="${esc(r)}" data-log="Busca recente ${esc(r)}"><span class="ic-lugar">${ic("relogio")}</span><span><strong>${esc(r)}</strong></span></button>`).join("")
+      : `<div class="msg-vazia">Digite o <strong>nome de um lugar</strong>, um <strong>ponto de parada</strong> ou o <strong>número da linha</strong>.</div>`;
+    return;
+  }
+  const {lugares, linhas} = buscar(qBruto);
+  if(!lugares.length && !linhas.length){
+    alvo.innerHTML = `<div class="erro-busca" role="status"><p>Não encontramos <strong>“${esc(qBruto)}”</strong>.</p>
+      <p>Tente o nome de um lugar, como <strong>UnB Gama</strong>, ou o número da linha.</p>
+      <button class="link-sug" data-acao="usarRecente" data-q="UnB Gama" data-log="Sugestão do erro: UnB Gama">Buscar “UnB Gama”</button></div>`;
+    registrar("busca sem resultado", qBruto);
+    return;
+  }
+  let h = "";
+  if(lugares.length) h += `<p class="grupo-tit">Lugares e pontos</p>` + lugares.map(l => l.tipo === "lugar"
+    ? `<button class="sug" data-acao="abrirLugar" data-log="Sugestão lugar ${l.nome}"><span class="ic-lugar">${ic("mapa")}</span><span><strong>${l.nome}</strong><small>${l.sub}</small></span></button>`
+    : `<button class="sug" data-acao="abrirPonto" data-ponto="${l.id}" data-log="Sugestão ponto ${l.id}"><span class="ic-lugar">${ic("onibus")}</span><span><strong>${l.nome}</strong><small>${l.sub}</small></span></button>`).join("");
+  if(linhas.length) h += `<p class="grupo-tit">Linhas</p>` + linhas.map(id => `<button class="sug" data-acao="abrirLinha" data-linha="${id}" data-log="Sugestão linha ${id}">${chip(id)}<span><strong>${LINHAS[id].destino}</strong><small>Saindo de Samambaia Norte</small></span></button>`).join("");
+  alvo.innerHTML = h;
+}
+function guardarRecente(){
+  const inp = document.getElementById("q"); if(!inp || !inp.value.trim()) return;
+  const v = inp.value.trim();
+  E.recentes = [v, ...E.recentes.filter(r => r !== v)].slice(0,4); salvar();
+  history.replaceState({tela:"A2", params:{q:v}}, "");
+}
+
+/* ---------- A3 — Resultados por lugar ou por ponto (PE-02) ---------- */
+TELAS.A3 = p => {
+  const lugar = p.modo === "lugar";
+  const ponto = PONTOS[E.ponto];
+  const ordem = lugar ? ORDEM_LUGAR : ORDEM_PONTO;
+  return `
+  <header class="topo"><button class="btn-icone" data-acao="voltar" data-log="Voltar" aria-label="Voltar">${ic("voltar")}</button><h1>${lugar ? "Linhas para o lugar" : "Próximas partidas"}</h1><span></span></header>
+  <div class="rolagem">
+    <div class="lugar-cab">${lugar ? `<span class="ic-lugar">${ic("mapa")}</span>` : `<span style="color:var(--azul-app)">${ic("onibus")}</span>`}
+      <div><strong>${lugar ? UNB : "Ponto " + ponto.nome}</strong>
+      <small>${lugar ? `Saindo do ponto ${ponto.nome} · ${ponto.dist} de você` : `${ponto.dist} de você · ${ordem.length} linhas passam aqui`}</small></div></div>
+    <p class="secao-tit">${lugar ? "Linhas que levam até lá" : "Linhas neste ponto"}</p>
+    ${ordem.map(id => itemLinha(id, lugar)).join("")}
+  </div>`;
+};
+function itemLinha(id, mostrarDesce){
+  const L = LINHAS[id];
+  let selo = "";
+  if(desatualizada(id)) selo = `<span class="selo alerta">${ic("alerta")}Posição desatualizada</span>`;
+  else if(L.vaiUnb && mostrarDesce) selo = `<span class="selo ok">${ic("check")}Vai até a UnB</span>`;
+  return `<button class="item" data-acao="abrirLinha" data-linha="${id}" data-log="Resultado linha ${id}">
+    <span class="item-l1">${chip(id)}<span class="dest">${L.destino}</span><span class="seta">${ic("seta")}</span></span>
+    <span class="item-l2"><span class="eta ${desatualizada(id)?"antiga":""}" data-eta="${id}">${etaTexto(id)}</span>
+    ${mostrarDesce ? `<span class="desce">${L.vaiUnb ? ic("mapa") : ic("andar")}${L.desce}</span>` : ""}${selo}</span>
+  </button>`;
+}
+
+/* ---------- A4 — Linha (T3, N1, N2) ---------- */
+TELAS.A4 = p => {
+  const id = p.linha, L = LINHAS[id], ponto = PONTOS[E.ponto];
+  return `
+  <header class="topo"><button class="btn-icone" data-acao="voltar" data-log="Voltar" aria-label="Voltar">${ic("voltar")}</button><h1>Linha ${id}</h1><span></span></header>
+  <div class="mapa-luz">${mapaClaro(id)}
+    <button class="fab cinza" style="top:14px" data-acao="mapaCheio" data-log="Botão tela cheia do mapa" aria-label="Ampliar o mapa">${ic("expandir")}</button>
+    <button class="fab azul" style="top:76px;width:52px;height:52px;right:17px" data-acao="localizar" data-log="Botão minha localização" aria-label="Mostrar minha localização">${ic("navegar")}</button>
+  </div>
+  <div class="folha">
+    <div class="alca"></div>
+    <div class="linha-cab">${chip(id)}<div><strong>${L.destino}</strong><small>Saindo do ponto ${ponto.nome}</small></div></div>
+    <div id="a4-prev">${blocoPrevisao(id)}</div>
+    <div id="a4-n1">${blocoN1(id)}</div>
+    <div id="a4-acoes">${blocoAcoes(id)}</div>
+    ${L.naoUnb ? `<div class="aviso-linha-errada">${ic("info")}<span>Esta linha vai para a <b>${L.destino}</b> e não passa pela UnB — Campus do Gama.</span></div>` : ""}
+    <p class="sec-tit">Sua viagem</p>
+    <ul class="tl" id="a4-tl">${blocoViagem(id)}</ul>
+  </div>`;
+};
+function blocoPrevisao(id){
+  const ponto = PONTOS[E.ponto];
+  const antiga = desatualizada(id);
+  return `<div class="previsao ${antiga?"antiga":""}"><span class="eta-grande">${etaTexto(id)}</span>${antiga?`<span class="nota-antiga">pode estar errada</span>`:""}
+    <span class="sub">no ponto ${ponto.nome}</span></div>
+    <div class="atualizacao ${antiga?"alerta":""}">${ic(antiga?"alerta":"relogio")}<span>${textoAtualizacao(id)}</span></div>`;
+}
+function blocoN1(id){
+  if(!desatualizada(id)) return "";
+  const min = Math.floor((Date.now() - E.n1.ultimaPos) / MIN);
+  return `<div class="aviso" role="alert">
+    <div class="aviso-l1">${ic("alerta")}<p><b>A posição do ônibus não é atualizada há ${min} min.</b> A previsão pode estar errada.</p></div>
+    ${E.n1.carregando
+      ? `<div class="carregando"><span class="giro"></span>Consultando a posição do ônibus…</div>`
+      : `<div class="aviso-botoes">
+          <button class="btn sec" data-acao="consultarDeNovo" data-log="N1 Consultar de novo">${ic("atualizar")}Consultar de novo</button>
+          <button class="btn sec" data-acao="verAlternativas" data-log="N1 Ver alternativas">${ic("alternativas")}Ver alternativas</button></div>`}
+  </div>`;
+}
+function blocoAcoes(id){
+  const fav = E.favs.includes(id), av = !!E.avisos[id];
+  return `<div class="acoes">
+    <button class="btn-acao ${fav?"ativo":""}" data-acao="favoritar" data-linha="${id}" data-log="${fav?"Desfavoritar":"Favoritar linha"} ${id}" aria-pressed="${fav}">${ic(fav?"marcador":"marcador")}${fav?"Favoritada":"Favoritar linha"}</button>
+    <button class="btn-acao ${av?"ativo":""}" data-acao="avisar" data-linha="${id}" data-log="${av?"Aviso ativo (tocar desativa)":"Avisar atraso"} ${id}" aria-pressed="${av}">${ic("sino")}${av?"Aviso ativo":"Avisar atraso"}</button>
+  </div>`;
+}
+function blocoViagem(id){
+  const L = LINHAS[id], ponto = PONTOS[E.ponto];
+  const emb = Date.now() + etaMin(id) * MIN;
+  const des = emb + L.viagem * MIN;
+  const fim = des + (L.andarFim ? L.andarFim.min * MIN : 0);
+  const sair = emb - ponto.andar * MIN;
+  return `
+    <li><span class="marca"><span class="ponto-azul"></span></span><span><b>Saia às ${hhmm(Math.max(Date.now(), sair))}</b></span></li>
+    <li><span class="marca">${ic("andar")}</span><span>Caminhe por ${ponto.dist} até o ponto (${ponto.andar} min)</span></li>
+    <li class="trecho-onibus"><span class="marca"></span><span>Você vai <b>embarcar</b> às ${hhmm(emb)} no ponto ${ponto.nome}<br><br>Você vai <b>desembarcar</b> às ${hhmm(des)} em ${L.desembarque}</span></li>
+    ${L.andarFim ? `<li><span class="marca">${ic("andar")}</span><span>Caminhe por ${L.andarFim.m} até a UnB (${L.andarFim.min} min)</span></li>` : ""}
+    <li><span class="marca"><span class="bandeira">${ic("bandeira")}</span></span><span><b>Chega às ${hhmm(fim)}</b><small>${L.naoUnb ? L.destino : UNB}</small></span></li>`;
+}
+function mapaClaro(id){
+  return `<svg class="mapa" viewBox="0 0 360 300" preserveAspectRatio="xMidYMid slice" aria-label="Mapa com a rota da linha ${id}, o ponto de embarque e o ônibus">
+    <rect width="360" height="300" fill="#F7F8FA"/>
+    <path d="M250 -10C300 40 330 60 380 70V-10z M300 180c30-10 50 10 80 0v130h-90c10-40-20-80 10-130z" fill="#CFE7FF"/>
+    <g fill="none" stroke="#D3DAE3" stroke-width="2">
+      <path d="M0 40H360M0 110H360M0 250H360M60 0V300M130 0V300M270 0V300"/><path d="M0 200C100 190 200 230 360 210"/><path d="M20 300C80 200 120 120 220 40"/>
+    </g>
+    <path id="rota-chegada" d="M330 -10C300 40 230 60 205 100S190 140 180 150" fill="none" stroke="#F3C905" stroke-width="6" stroke-linecap="round"/>
+    <path d="M180 150C165 175 150 210 120 240S60 290 40 320" fill="none" stroke="#F3C905" stroke-width="6" stroke-linecap="round"/>
+    <path d="M140 172C152 166 166 158 176 152" fill="none" stroke="#333" stroke-width="3" stroke-dasharray="1 7" stroke-linecap="round"/>
+    <g transform="translate(180 150)"><circle r="17" fill="#FFF7CC" stroke="#F3C905" stroke-width="3"/><use href="#i-onibus" x="-10" y="-10" width="20" height="20" stroke="#C59A00" fill="none" stroke-width="2.2"/></g>
+    <circle cx="140" cy="174" r="15" fill="#3B87FF" opacity=".2"/><circle cx="140" cy="174" r="7" fill="#3B87FF" stroke="#fff" stroke-width="2.5"/>
+    <g id="onibus" transform="translate(330 -10)">
+      <rect x="-17" y="-15" width="34" height="30" rx="8" fill="${desatualizada(id)?"#9E9E9E":"#175898"}" stroke="#fff" stroke-width="2"/>
+      <use href="#i-onibus" x="-11" y="-11" width="22" height="22" stroke="#fff" fill="none" stroke-width="2"/>
+    </g>
+  </svg>`;
+}
+function posicionarOnibus(){
+  const rota = document.getElementById("rota-chegada"), bus = document.getElementById("onibus");
+  if(!rota || !bus || !telaAtual || telaAtual.tela !== "A4") return;
+  const id = telaAtual.params.linha;
+  const ref = desatualizada(id) ? E.n1.ultimaPos : ultimaPos(id);
+  const faltaMin = desatualizada(id) ? E.n1.etaCong + 0.5 : (chegada(id) - ref) / MIN;
+  const prog = Math.min(1, Math.max(0.04, 1 - faltaMin / 12));
+  const pt = rota.getPointAtLength(prog * rota.getTotalLength());
+  bus.setAttribute("transform", `translate(${pt.x.toFixed(1)} ${pt.y.toFixed(1)})`);
+  bus.querySelector("rect").setAttribute("fill", desatualizada(id) ? "#9E9E9E" : "#175898");
+}
+
+/* ---------- A5 — Alternativas (T4) ---------- */
+TELAS.A5 = () => `
+  <header class="topo"><button class="btn-icone" data-acao="voltar" data-log="Voltar" aria-label="Voltar">${ic("voltar")}</button><h1>Alternativas</h1><span></span></header>
+  <div class="rolagem">
+    <div class="lugar-cab"><span class="ic-lugar">${ic("mapa")}</span><div><strong>Outras opções para ${UNB}</strong>
+      <small>Saindo do ponto ${PONTOS[E.ponto].nome}</small></div></div>
+    ${["2310","2301","2302"].map(id => itemLinha(id, true)).join("")}
+  </div>`;
+
+/* ---------- A6 — Favoritos ---------- */
+TELAS.A6 = () => `
+  <header class="topo"><span></span><h1>Favoritos</h1><span></span></header>
+  <div class="rolagem">${E.favs.length
+    ? `<p class="secao-tit">Suas linhas favoritas</p>` + E.favs.map(id => `<button class="item" data-acao="abrirLinha" data-linha="${id}" data-log="Favorita ${id} (aba)">
+        <span class="item-l1">${chip(id)}<span class="dest">${LINHAS[id].destino}</span><span class="seta">${ic("seta")}</span></span>
+        <span class="item-l2"><span class="eta ${desatualizada(id)?"antiga":""}" data-eta="${id}">${etaTexto(id)}</span>
+        ${E.avisos[id] ? `<span class="selo ok">${ic("sino")}Aviso de atraso ativo</span>` : ""}${desatualizada(id)?`<span class="selo alerta">${ic("alerta")}Posição desatualizada</span>`:""}</span></button>`).join("")
+    : `<div class="vazio-grande">${ic("marcador")}<p>Você ainda não tem linhas favoritas.</p><p>Na tela de uma linha, toque em <b>Favoritar linha</b>.</p></div>`}
+  </div>`;
+
+/* ---------- E2 — Fora do protótipo ---------- */
+const fora = (titulo, comVoltar) => `
+  <header class="topo">${comVoltar ? `<button class="btn-icone" data-acao="voltar" data-log="Voltar" aria-label="Voltar">${ic("voltar")}</button>` : "<span></span>"}<h1>${titulo}</h1><span></span></header>
+  <div class="rolagem"><div class="fora">${ic("info")}<p><b>Esta parte não está disponível no protótipo.</b></p>
+  <button class="btn prim" data-acao="${comVoltar ? "voltar" : "irInicio"}" data-log="Voltar (fora do protótipo)">${comVoltar ? "Voltar" : "Voltar ao mapa"}</button></div></div>`;
+TELAS.horarios = () => fora("Horários", false);
+TELAS.mais = () => fora("Mais", false);
+TELAS.ajuda = () => fora("Ajuda", true);
+
+/* ---------- Aviso flutuante ---------- */
+let toastTimer;
+function aviso(msg, desfazer){
+  const t = document.getElementById("toast");
+  t.querySelector("span").textContent = msg;
+  const b = t.querySelector("button");
+  b.hidden = !desfazer;
+  b.onclick = desfazer ? () => { registrar("toque", "Desfazer"); desfazer(); t.classList.remove("visivel"); } : null;
+  t.classList.add("visivel");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove("visivel"), 4500);
+}
+
+/* ---------- N2b — Folha do aviso de atraso ---------- */
+function abrirFolhaAviso(id){
+  const veu = document.getElementById("veu-aviso");
+  veu.innerHTML = `<div class="modal" role="dialog" aria-modal="true" aria-labelledby="tit-aviso">
+    <div class="alca"></div>
+    <h2 id="tit-aviso">Avisar se a linha ${id} atrasar?</h2>
+    <p>Você recebe uma notificação quando o ônibus estiver atrasado no ponto ${PONTOS[E.ponto].nome}.</p>
+    <label class="opcao marcada"><input type="radio" name="quando" value="manha" checked><span><b>Toda manhã</b><small>Das 6h às 9h, de segunda a sexta</small></span></label>
+    <label class="opcao"><input type="radio" name="quando" value="sempre"><span><b>Sempre</b><small>Em qualquer horário</small></span></label>
+    <div class="modal-botoes">
+      <button class="btn sec" data-acao="fecharFolha" data-log="Cancelar aviso">Cancelar</button>
+      <button class="btn prim" data-acao="ativarAviso" data-linha="${id}" data-log="Ativar aviso ${id}">${ic("sino")}Ativar aviso</button>
+    </div></div>`;
+  veu.hidden = false;
+  veu.querySelectorAll("input").forEach(r => r.addEventListener("change", () => {
+    veu.querySelectorAll(".opcao").forEach(o => o.classList.toggle("marcada", o.querySelector("input").checked));
+    registrar("toque", "Opção do aviso: " + r.value);
+  }));
+}
+function fecharFolha(){ const v = document.getElementById("veu-aviso"); v.hidden = true; v.innerHTML = ""; }
+
+/* ---------- N1 ---------- */
+function ativarN1(origem){
+  E.n1.etaCong = Math.max(1, Math.floor((chegada("2310") - Date.now()) / MIN));
+  E.n1.ativo = true; E.n1.resolvido = false; E.n1.carregando = false;
+  E.n1.ultimaPos = Date.now() - 5 * MIN;
+  registrar("aviso N1 exibido", origem);
+  salvar(); redesenharDinamico(true);
+}
+function consultarDeNovo(){
+  E.n1.carregando = true; salvar(); redesenharDinamico(true);
+  setTimeout(() => {
+    E.n1.carregando = false; E.n1.ativo = false; E.n1.resolvido = true;
+    E.chegadas["2310"] = Date.now() + 7 * MIN - 1000; // "Chega em 6 min" (D3)
+    registrar("N1 resolvido", "posição atualizada");
+    salvar(); redesenharDinamico(true);
+    aviso("Posição do ônibus atualizada agora");
+  }, 2000);
+}
+
+/* ---------- Ações (delegação de eventos) ---------- */
+const ACOES = {
+  abrirBusca: () => ir("A2", {q:""}),
+  voltar: () => voltar(),
+  irInicio: () => ir("A1", {}, true),
+  aba: el => { const a = el.dataset.aba; if(telaAtual && telaAtual.tela === a) return; ir(a, {}); },
+  limparBusca: () => { const i = document.getElementById("q"); i.value = ""; i.focus(); atualizarSugestoes(""); },
+  usarRecente: el => { const i = document.getElementById("q"); i.value = el.dataset.q; guardarRecente(); atualizarSugestoes(i.value); registrar("busca", i.value); },
+  abrirLugar: () => { guardarRecente(); E.ponto = "qr304"; salvar(); ir("A3", {modo:"lugar"}); },
+  abrirPonto: el => { guardarRecente(); E.ponto = el.dataset.ponto; salvar(); ir("A3", {modo:"ponto"}); },
+  abrirLinha: el => { guardarRecente(); if(!telaAtual || telaAtual.tela === "A2" || telaAtual.tela === "A1" || telaAtual.tela === "A6") { E.ponto = "qr304"; salvar(); } ir("A4", {linha:el.dataset.linha}); },
+  verAlternativas: () => ir("A5", {}),
+  consultarDeNovo: () => consultarDeNovo(),
+  favoritar: el => {
+    const id = el.dataset.linha;
+    if(E.favs.includes(id)){
+      E.favs = E.favs.filter(f => f !== id); salvar(); redesenharDinamico();
+      aviso(`Linha ${id} removida dos favoritos`, () => { E.favs.push(id); salvar(); redesenharDinamico(); });
+    } else {
+      E.favs.push(id); salvar(); redesenharDinamico();
+      aviso(`Linha ${id} salva nos favoritos`, () => { E.favs = E.favs.filter(f => f !== id); salvar(); redesenharDinamico(); });
+    }
+  },
+  avisar: el => {
+    const id = el.dataset.linha;
+    if(E.avisos[id]){
+      const antes = E.avisos[id]; delete E.avisos[id]; salvar(); redesenharDinamico();
+      aviso(`Aviso de atraso da linha ${id} desativado`, () => { E.avisos[id] = antes; salvar(); redesenharDinamico(); });
+    } else abrirFolhaAviso(id);
+  },
+  ativarAviso: el => {
+    const id = el.dataset.linha;
+    const v = document.querySelector('#veu-aviso input[name=quando]:checked');
+    E.avisos[id] = v ? v.value : "manha"; salvar(); fecharFolha(); redesenharDinamico();
+    aviso(`Você será avisado se a linha ${id} atrasar`);
+  },
+  fecharFolha: () => fecharFolha(),
+  localizar: () => aviso("Você está perto do ponto QR 304 — Samambaia Norte"),
+  mapaCheio: () => { const t = palco.querySelector(".tela"); t.classList.toggle("mapa-cheio"); }
+};
+document.addEventListener("click", ev => {
+  const el = ev.target.closest("[data-acao]");
+  if(ev.target.closest("#painel")) return;
+  if(!el){
+    if(!ev.target.closest("input,label,#toast")) registrar("toque sem ação", (ev.target.closest("[class]")||{}).className || ev.target.tagName);
+    return;
+  }
+  registrar("toque", el.dataset.log || el.dataset.acao);
+  const f = ACOES[el.dataset.acao]; if(f) f(el);
+});
+document.getElementById("veu-aviso").addEventListener("click", ev => { if(ev.target.id === "veu-aviso"){ registrar("toque", "Fora da folha (fechar)"); fecharFolha(); } });
+document.addEventListener("input", ev => { if(ev.target.id === "q") atualizarSugestoes(ev.target.value); });
+document.addEventListener("keydown", ev => {
+  if(ev.target.id === "q" && ev.key === "Enter"){
+    ev.preventDefault();
+    const v = ev.target.value; registrar("busca (Enter)", v);
+    const {lugares, linhas} = buscar(v);
+    guardarRecente();
+    if(lugares.length && lugares[0].tipo === "lugar") ir("A3", {modo:"lugar"});
+    else if(lugares.length){ E.ponto = lugares[0].id; salvar(); ir("A3", {modo:"ponto"}); }
+    else if(linhas.length === 1){ E.ponto = "qr304"; ir("A4", {linha:linhas[0]}); }
+    else { ev.target.blur(); atualizarSugestoes(v); }
+  }
+});
+
+/* ---------- Atualização a cada segundo ---------- */
+function redesenharDinamico(n1Mudou){
+  if(!telaAtual) return;
+  const t = telaAtual.tela;
+  if(t === "A4"){
+    const id = telaAtual.params.linha;
+    const set = (sel, html) => { const el = document.getElementById(sel); if(el) el.innerHTML = html; };
+    set("a4-prev", blocoPrevisao(id)); set("a4-tl", blocoViagem(id)); set("a4-acoes", blocoAcoes(id));
+    if(n1Mudou) set("a4-n1", blocoN1(id));
+    posicionarOnibus();
+  } else if(t === "A3" || t === "A5" || t === "A6"){
+    if(n1Mudou){ const r = palco.querySelector(".rolagem"); const y = r ? r.scrollTop : 0; mostrarSemRegistro(); const r2 = palco.querySelector(".rolagem"); if(r2) r2.scrollTop = y; }
+    else palco.querySelectorAll("[data-eta]").forEach(el => el.textContent = etaTexto(el.dataset.eta));
+  } else if(t === "A1"){
+    const c = document.getElementById("cab-inicio");
+    if(c){ const f = c.querySelector(".favs"); if(f) f.outerHTML = faixaFavoritos(); }
+  }
+}
+function mostrarSemRegistro(){
+  const fn = TELAS[telaAtual.tela];
+  palco.innerHTML = `<section class="tela" data-tela="${telaAtual.tela}">${fn(telaAtual.params || {})}</section>`;
+}
+let ultimoMinN1 = null;
+setInterval(() => {
+  // N1 automático (D2): X s depois da primeira abertura da linha 2310
+  if(!E.n1.ativo && !E.n1.resolvido && E.n1.abertura && Date.now() - E.n1.abertura >= E.n1.atraso * 1000) ativarN1("automático");
+  if(!telaAtual) return;
+  if(telaAtual.tela === "A4"){
+    const id = telaAtual.params.linha;
+    const el = document.getElementById("a4-prev"); if(el) el.innerHTML = blocoPrevisao(id);
+    const tl = document.getElementById("a4-tl"); if(tl) tl.innerHTML = blocoViagem(id);
+    if(desatualizada(id)){ const m = Math.floor((Date.now() - E.n1.ultimaPos) / MIN); if(m !== ultimoMinN1 && !E.n1.carregando){ ultimoMinN1 = m; const n = document.getElementById("a4-n1"); if(n) n.innerHTML = blocoN1(id); } }
+    posicionarOnibus();
+  } else palco.querySelectorAll("[data-eta]").forEach(el => el.textContent = el.classList.contains("eta-p") ? etaMin(el.dataset.eta) + " min" : etaTexto(el.dataset.eta));
+}, 1000);
+
+/* ---------- Painel do condutor (segurar 3 s na faixa azul do início, ou #condutor) ---------- */
+function ligarSegurar(){
+  const alvo = document.getElementById("faixa"); if(!alvo) return;
+  let tm;
+  const ini = () => { tm = setTimeout(abrirPainel, 3000); };
+  const fim = () => clearTimeout(tm);
+  alvo.addEventListener("pointerdown", ini); ["pointerup","pointerleave","pointercancel"].forEach(e => alvo.addEventListener(e, fim));
+}
+function abrirPainel(){
+  const p = document.getElementById("painel");
+  const inicio = new Date(E.t0).toLocaleTimeString("pt-BR");
+  p.innerHTML = `<div class="modal" role="dialog" aria-modal="true">
+    <h2>Painel do condutor</h2>
+    <p class="meta">Versão do protótipo: <b>${VERSAO}</b><br>Sessão nº ${E.sessao}, iniciada às ${inicio} · ${E.registro.length} registros<br>
+    Aviso N1: ${E.n1.ativo ? "exibido" : E.n1.resolvido ? "resolvido" : E.n1.abertura ? "aguardando" : "linha 2310 ainda não aberta"}</p>
+    <button class="btn prim" data-p="nova">Nova sessão (zerar tudo)</button>
+    <button class="btn sec" data-p="n1">Mostrar aviso N1 agora</button>
+    <div class="linha-p"><label for="atr">Aviso N1 aparece após (s)</label><input id="atr" type="number" min="5" max="600" value="${E.n1.atraso}"></div>
+    <button class="btn sec" data-p="baixar">Exportar registro (.json)</button>
+    <button class="btn sec" data-p="copiar">Mostrar registro para copiar</button>
+    <div id="saida"></div>
+    <button class="btn sec" data-p="fechar">Fechar</button></div>`;
+  p.hidden = false;
+  p.querySelector("#atr").addEventListener("change", ev => { E.n1.atraso = Math.max(5, +ev.target.value || 20); salvar(); });
+  p.onclick = ev => {
+    const b = ev.target.closest("[data-p]"); if(!b) return;
+    const a = b.dataset.p;
+    if(a === "fechar"){ p.hidden = true; }
+    if(a === "nova"){ if(!confirm("Zerar favoritos, avisos, buscas e registro para uma nova sessão?")) return;
+      const s = E.sessao + 1, atr = E.n1.atraso; E = estadoNovo(); E.sessao = s; E.n1.atraso = atr; salvar();
+      p.hidden = true; history.replaceState({tela:"A1", params:{}}, ""); mostrar({tela:"A1", params:{}}); }
+    if(a === "n1"){ ativarN1("painel do condutor"); p.hidden = true; }
+    if(a === "baixar"){
+      const blob = new Blob([JSON.stringify({versao:VERSAO, sessao:E.sessao, inicio:new Date(E.t0).toISOString(), registro:E.registro}, null, 1)], {type:"application/json"});
+      const url = URL.createObjectURL(blob), l = document.createElement("a");
+      l.href = url; l.download = `registro-sessao-${E.sessao}.json`; document.body.appendChild(l); l.click(); l.remove(); setTimeout(() => URL.revokeObjectURL(url), 2000);
+    }
+    if(a === "copiar"){
+      const txt = E.registro.map(r => `${r.hora}\t${r.s}s\t${r.tela}\t${r.evento}\t${r.alvo}`).join("\n");
+      p.querySelector("#saida").innerHTML = `<textarea readonly>${esc(txt)}</textarea>`;
+      p.querySelector("textarea").select();
+    }
+  };
+}
+
+/* ---------- Início ---------- */
+salvar();
+const inicial = (history.state && history.state.tela) ? history.state : {tela:"A1", params:{}};
+history.replaceState(inicial, "");
+mostrar(inicial);
+if(location.hash === "#condutor"){ history.replaceState(inicial, "", location.pathname + location.search); abrirPainel(); }
+</script>
+</body>
+</html>
