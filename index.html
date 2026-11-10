@@ -18,11 +18,11 @@
 /* Protótipo de alta fidelidade da TAR-06 (Grupo 05 — IHC 2026/2). Autor do design: Carlos Costa.
    Cores medidas nas capturas do aplicativo DF no Ponto (prototipo-plan.md, seção 2.1). */
 :root{
-  --azul-app:#175898; --azul-texto:#194778; --azul-link:#417AD4; --azul-acao:#2196F3; --azul-ponto:#3B87FF;
+  --azul-app:#175898; --azul-texto:#194778; --azul-link:#2F68C0; --azul-acao:#2196F3; --azul-ponto:#3B87FF;
   --amarelo-ativo:#ECB43B; --amarelo-linha:#FFD403; --fundo:#F5F5F5; --cartao:#FFFFFF; --texto:#252525;
-  --texto-apoio:#6B6B6B; --texto-dica:#9A9A9A; --linha-div:#E3E3E3; --cinza-botao:#656565;
+  --texto-apoio:#6B6B6B; --texto-dica:#707070; --linha-div:#E3E3E3; --cinza-botao:#656565;
   --mapa-escuro:#1A2A41; --mapa-agua:#CFE7FF;
-  --alerta:#B85C00; --alerta-fundo:#FFF3E0; --alerta-borda:#F0B46A; --sucesso:#2E7D32;
+  --alerta:#A04F00; --alerta-fundo:#FFF3E0; --alerta-borda:#F0B46A; --sucesso:#2E7D32;
   --seg-topo:env(safe-area-inset-top,0px); --seg-base:env(safe-area-inset-bottom,0px);
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -126,7 +126,7 @@ svg.i{width:24px;height:24px;flex:none;fill:none;stroke:currentColor;stroke-widt
 .selo.ok{background:#E3F0FC;color:var(--azul-texto)}
 .selo.alerta{background:var(--alerta-fundo);color:var(--alerta)}
 .selo.nao{background:#EEE;color:#555}
-.eta.antiga{color:#8A8A8A;text-decoration:line-through}
+.eta.antiga{color:#757575;text-decoration:line-through}
 
 /* Tela da linha */
 .mapa-luz{position:relative;height:36%;min-height:200px;flex:none;background:#F7F8FA;transition:height .25s}
@@ -142,7 +142,7 @@ svg.i{width:24px;height:24px;flex:none;fill:none;stroke:currentColor;stroke-widt
 .previsao{margin-top:16px}
 .eta-grande{font-size:28px;font-weight:700;color:var(--azul-texto);line-height:1.15}
 .previsao .sub{display:block;color:var(--texto-apoio);font-size:14.5px;margin-top:4px}
-.previsao.antiga .eta-grande{color:#8A8A8A}
+.previsao.antiga .eta-grande{color:#757575}
 .nota-antiga{display:inline-block;margin-left:6px;font-size:14px;font-weight:500;color:var(--alerta)}
 .atualizacao{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:15px;color:#3E3E3E}
 .atualizacao svg.i{width:20px;height:20px;color:var(--azul-app)}
