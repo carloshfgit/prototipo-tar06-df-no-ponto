@@ -1,6 +1,6 @@
 # Protótipo de Alta Fidelidade - TAR-06 (DF no Ponto)
 
-Protótipo navegável usado na **avaliação de alta fidelidade da TAR-06 — Consulta de ônibus em tempo real no DF no Ponto**. Faz parte do projeto do **Grupo 05** da disciplina **Interação Humano-Computador** (FCTE/UnB, semestre 2026/2), que avalia e propõe o reprojeto dos serviços digitais da SEMOB-DF.
+Protótipo navegável usado na **avaliação de alta fidelidade da TAR-06 - Consulta de ônibus em tempo real no DF no Ponto**. Faz parte do projeto do **Grupo 05** da disciplina **Interação Humano-Computador** (FCTE/UnB, semestre 2026/2), que avalia e propõe o reprojeto dos serviços digitais da SEMOB-DF.
 
 | | |
 | :--- | :--- |
