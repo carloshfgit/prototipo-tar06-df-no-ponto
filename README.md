@@ -190,8 +190,12 @@ Também é possível abrir o `index.html` direto, com duplo clique. Um servidor 
 ├── manifest.webmanifest   # permite instalar na tela inicial e abrir em tela cheia
 ├── icone.svg              # ícone do protótipo
 ├── capturas/              # capturas de todas as telas e estados (390 × 844, 2x)
+├── .github/workflows/
+│   └── pages.yml          # publicação no GitHub Pages
 └── README.md
 ```
+
+**Publicação.** O GitHub Pages é atualizado pelo workflow `pages.yml` só quando um push na `main` altera `index.html`, `manifest.webmanifest`, `icone.svg` ou o próprio workflow. Só esses três arquivos são publicados. Mudanças no README ou nas capturas não disparam o deploy. Para publicar manualmente, use **Actions → Publicar protótipo no GitHub Pages → Run workflow**.
 
 ## 9. Detalhes técnicos
 
