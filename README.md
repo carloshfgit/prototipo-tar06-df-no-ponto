@@ -132,7 +132,7 @@ O vocabulário e as regras de interação seguem o Guia de Estilo do projeto:
 
 ### No celular (forma usada nas sessões)
 
-1. Abra o link no **Chrome** do celular.
+1. Abra o link (https://carloshfgit.github.io/prototipo-tar06-df-no-ponto/) no **Chrome** do celular.
 2. No menu do navegador, toque em **"Adicionar à tela inicial"**. O protótipo passa a abrir em tela cheia, sem a barra de endereço, como um aplicativo.
 3. Antes de cada participante, abra o painel do condutor e toque em **"Nova sessão"** (seção 6).
 
